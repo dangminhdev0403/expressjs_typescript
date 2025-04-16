@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Express TS",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "args": ["${workspaceFolder}/src/index.ts"],
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "console": "integratedTerminal", // 👈 hiện log ở terminal bên trong VS Code
+      "internalConsoleOptions": "openOnSessionStart", // 👈 tự mở debug console
+      "outputCapture": "std" // 👈 bắt log stdout (console.log, v.v.)
+    }
+  ]
+}
