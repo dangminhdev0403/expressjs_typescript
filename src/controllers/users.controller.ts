@@ -1,12 +1,12 @@
 import User from '@models/schemas/user.Chemas.js'
 import { MongoDBClient } from '@services/MongoDBClient.js'
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 
-const loginController = (req: Request, res: Response, next: NextFunction): void => {
+const loginController = (req: Request, res: Response): void => {
   res.json({ message: 'Đăng nhập thành công' })
 }
 
-const registerController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const registerController = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body
 
   try {
