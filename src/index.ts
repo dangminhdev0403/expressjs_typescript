@@ -5,6 +5,21 @@ import express from 'express'
 const port = 8080
 const app = express()
 
+// Lấy địa chỉ IP nội bộ (LAN)
+// function getLocalIPAddress() {
+//   const interfaces = os.networkInterfaces()
+//   for (const name of Object.keys(interfaces)) {
+//     for (const iface of interfaces[name] || []) {
+//       if (iface.family === 'IPv4' && !iface.internal) {
+//         return iface.address
+//       }
+//     }
+//   }
+//   return '127.0.0.1' // fallback
+// }
+
+const ip = '127.0.0.1'
+
 app.use(express.json())
 
 // Route test
@@ -21,19 +36,15 @@ app.use('/users', usersRouter)
 
 async function startServer() {
   try {
-    // Sử dụng Singleton để lấy instance của MongoDBClient
     const dbClient = MongoDBClient.getInstance()
-
-    // Kết nối MongoDB
     await dbClient.connect()
 
-    // Bắt đầu lắng nghe server
-    app.listen(port, () => {
-      console.log(`Example app listening on port ${port}`)
+    app.listen(port, ip, () => {
+      console.log(`🚀 Server listening on http://${ip}:${port}`)
     })
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error)
-    process.exit(1) // Dừng server nếu không kết nối được MongoDB
+    process.exit(1)
   }
 }
 

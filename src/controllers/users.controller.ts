@@ -1,16 +1,18 @@
-import User from '@models/schemas/user.Chemas.js'
-import { MongoDBClient } from '@services/MongoDBClient.js'
+import { RegisterRequestBody } from '@models/request/Users.request.js'
+import userService from '@services/UserService.js'
 import { Request, Response } from 'express'
+import { ParamsDictionary } from 'express-serve-static-core'
 
 const loginController = (req: Request, res: Response): void => {
   res.json({ message: 'Đăng nhập thành công' })
 }
 
-const registerController = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body
-
+const registerController = async (
+  req: Request<ParamsDictionary, Record<string, unknown>, RegisterRequestBody>,
+  res: Response
+): Promise<void> => {
   try {
-    const result = await MongoDBClient.getInstance().users.insertOne(new User({ email, password }))
+    const result = await userService.register(req.body)
     res.json({
       message: 'Đăng ký thành công',
       data: result

@@ -1,3 +1,4 @@
+import userService from '@services/UserService.js'
 import { messages } from '@utils/validationMessages.js'
 import { checkSchema } from 'express-validator'
 
@@ -22,7 +23,14 @@ export const registerValidator = checkSchema({
     isEmail: {
       errorMessage: messages.invalidEmail
     },
-    normalizeEmail: true
+    normalizeEmail: true,
+    custom: {
+      options: async (value: string) => {
+        const result = await userService.checkEmailExist(value)
+        if (result) throw new Error('Email already exists')
+        return true
+      }
+    }
   },
   password: {
     isString: {
