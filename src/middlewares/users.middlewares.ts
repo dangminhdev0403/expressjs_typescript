@@ -88,42 +88,49 @@ export const registerValidator = checkSchema({
   }
 })
 
-export const loginValidator = checkSchema({
+export const validateEmailSchema = checkSchema({
   email: {
-    notEmpty: {
-      errorMessage: messages.required('Email')
-    },
-    isEmail: {
-      errorMessage: messages.invalidEmail
-    },
+    notEmpty: { errorMessage: messages.required('Email') },
+    isEmail: { errorMessage: messages.invalidEmail },
     normalizeEmail: true,
     trim: true,
     custom: {
-      options: async (value: string, { req }) => {
+      options: async (value, { req }) => {
         const user = await userService.checkEmailExist(value)
-        if (!user) throw Error(messages.BAD_CREDENTIALS)
+
         req.user = user
-        return true
-      }
-    }
-  },
-  password: {
-    isString: {
-      errorMessage: messages.mustBeString('Password')
-    },
-    notEmpty: {
-      errorMessage: messages.required('Password')
-    },
-    isLength: {
-      options: { min: 6, max: 100 },
-      errorMessage: messages.lengthBetween('Password', 6, 100)
-    },
-    custom: {
-      options: async (value: string, { req }) => {
-        const user = req.user as { _id: string; password: string }
-        if (user.password !== hashPassword(value)) throw Error(messages.BAD_CREDENTIALS)
+
+        if (!user) throw Error('Email does not exist')
+
+        console.log('check email', user)
+
         return true
       }
     }
   }
 })
+
+export const validatePasswordSchema = checkSchema({
+  password: {
+    isString: { errorMessage: messages.mustBeString('Password') },
+    notEmpty: { errorMessage: messages.required('Password') },
+    isLength: {
+      options: { min: 6, max: 100 },
+      errorMessage: messages.lengthBetween('Password', 6, 100)
+    },
+    custom: {
+      options: async (value, { req }) => {
+        console.log('Checkk password')
+
+        const user = req.user
+
+        if (!user) throw Error('User not found')
+        const hashedInput = hashPassword(value)
+        if (user.password !== hashedInput) throw Error('Invalid password')
+        return true
+      }
+    }
+  }
+})
+
+export const loginValidator = () => [...validateEmailSchema, ...validatePasswordSchema]

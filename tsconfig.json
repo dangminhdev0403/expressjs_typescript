@@ -18,5 +18,6 @@
     "sourceMap": true // Có thể giúp debug dễ hơn
   },
   "files": ["src/type.d.ts"],
-  "include": ["src/**/*"]
+
+  "include": ["src/**/*.ts"]
 }

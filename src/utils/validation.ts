@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import { ValidationChain, validationResult } from 'express-validator'
 import { RunnableValidationChains } from 'express-validator/lib/middlewares/schema.js'
 
@@ -15,4 +15,23 @@ const validate = (validations: RunnableValidationChains<ValidationChain>) => {
   }
 }
 
+/**
+ * Middleware to validate multiple schemas
+ */
+export const validates = (validations: ValidationChain[]) => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    // Chạy từng validation chain
+    for (const validation of validations) {
+      await validation.run(req)
+    }
+
+    // Kiểm tra lỗi sau khi chạy validation
+    const errors = validationResult(req)
+    if (errors.isEmpty()) {
+      return next()
+    }
+
+    res.status(400).json({ errors: errors.mapped() })
+  }
+}
 export { validate }

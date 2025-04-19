@@ -1,5 +1,6 @@
+import { MongoDBClient } from '@config/MongoDBClient.js'
+import { morganMiddleware } from '@config/morgan.js'
 import usersRouter from '@routers/users.routers.js'
-import { MongoDBClient } from '@services/MongoDBClient.js'
 import express from 'express'
 
 const port = 8080
@@ -21,6 +22,7 @@ const app = express()
 const ip = '127.0.0.1'
 
 app.use(express.json())
+app.use(morganMiddleware)
 
 // Route test
 app.get('/', (req, res) => {
