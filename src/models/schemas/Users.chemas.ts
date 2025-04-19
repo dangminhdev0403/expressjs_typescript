@@ -7,7 +7,7 @@ interface UserType {
   email: string
   password: string
   verifyStatus?: UserVerifyStatus
-  data_of_birth?: Date
+  date_of_birth?: Date
   createdAt?: Date
   updatedAt?: Date
   emailVerifyToken?: string
@@ -25,7 +25,7 @@ export default class User {
   email: string
   password: string
   verifyStatus: UserVerifyStatus
-  data_of_birth: Date
+  date_of_birth: Date
   createdAt: Date
   updatedAt: Date
   emailVerifyToken: string
@@ -43,7 +43,7 @@ export default class User {
     this.email = user.email
     this.password = user.password
     this.verifyStatus = user.verifyStatus ?? UserVerifyStatus.Unverified
-    this.data_of_birth = user.data_of_birth || new Date()
+    this.date_of_birth = user.date_of_birth || new Date()
     this.createdAt = user.createdAt || date
     this.updatedAt = user.updatedAt || date
     this.emailVerifyToken = user.emailVerifyToken ?? ''

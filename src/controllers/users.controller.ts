@@ -3,8 +3,12 @@ import userService from '@services/UserService.js'
 import { Request, Response } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 
-const loginController = (req: Request, res: Response): void => {
-  res.json({ message: 'Đăng nhập thành công' })
+const loginController = async (req: Request, res: Response): Promise<void> => {
+  const user = req.user as { _id: string } // hoặc kiểu phù hợp với user của bạn
+
+  const result = await userService.login(user._id.toString())
+
+  res.status(200).json({ message: 'Đăng nhập thành công', data: result })
 }
 
 const registerController = async (

@@ -1,4 +1,4 @@
-import User from '@models/schemas/user.Chemas.js'
+import User from '@models/schemas/Users.chemas.js'
 import dotenv from 'dotenv'
 import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb'
 

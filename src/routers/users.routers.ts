@@ -1,5 +1,5 @@
 import { loginController, registerController } from '@controllers/users.controller.js'
-import { registerValidator } from '@middlewares/users.middlewares.js'
+import { loginValidator, registerValidator } from '@middlewares/users.middlewares.js'
 import { validate } from '@utils/validation.js'
 import { Router } from 'express'
 
@@ -9,7 +9,7 @@ usersRouter.get('/', (req, res) => {
   res.send('users')
 })
 
-usersRouter.post('/login', loginController)
+usersRouter.post('/login', validate(loginValidator), loginController)
 // usersRouter.post('/register', (req, res, next) => {
 //   registerController(req, res).catch(next)
 // })

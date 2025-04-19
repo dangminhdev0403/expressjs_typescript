@@ -6,5 +6,7 @@ export const messages = {
   minLength: (field: string, min: number) => `${field} must be at least ${min} characters long`,
   strongPassword: `${'Password'} must be strong (uppercase, lowercase, number, symbol)`,
   invalidEmail: 'Email is invalid',
-  invalidDate: 'Date of birth must be a valid ISO8601 date (YYYY-MM-DD)'
+  invalidDate: 'Date of birth must be a valid ISO8601 date (YYYY-MM-DD)',
+  notFound: (field: string) => `${field} not found`,
+  BAD_CREDENTIALS: 'Invalid username or password'
 }

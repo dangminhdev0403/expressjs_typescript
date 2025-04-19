@@ -1,11 +1,15 @@
 import { TokenType } from '@constants/enum.js'
 import { RegisterRequestBody } from '@models/request/Users.request.js'
-import User from '@models/schemas/user.Chemas.js'
+import User from '@models/schemas/Users.chemas.js'
 import { MongoDBClient } from '@services/MongoDBClient.js'
 import { hashPassword } from '@utils/cryto.js'
 import signToken from '@utils/jwt.js'
+import { messages } from '@utils/validationMessages.js'
 
 class UserService {
+  private signToken(user_id: string) {
+    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
+  }
   private async signAccessToken(user_id: string) {
     return signToken({
       payload: {
@@ -29,19 +33,24 @@ class UserService {
     )
 
     const user_id = result.insertedId.toString()
-    const [access_token, refresh_token] = await Promise.all([
-      this.signAccessToken(user_id),
-      this.signRefreshToken(user_id)
-    ])
-    return {
-      access_token,
-      refresh_token
-    }
+    const [access_token, refresh_token] = await this.signToken(user_id)
+    return { access_token, refresh_token }
   }
 
   async checkEmailExist(email: string) {
     const user = await MongoDBClient.getInstance().users.findOne({ email })
-    return Boolean(user)
+    return user
+  }
+
+  async checkAccount({ email, password }: { email: string; password: string }) {
+    const user = await MongoDBClient.getInstance().users.findOne({ email, password: hashPassword(password) })
+    if (!user) throw new Error(messages.BAD_CREDENTIALS)
+    return user
+  }
+
+  async login(user_id: string) {
+    const [access_token, refresh_token] = await this.signToken(user_id)
+    return { access_token, refresh_token }
   }
 }
 
