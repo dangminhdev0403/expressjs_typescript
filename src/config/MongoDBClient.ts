@@ -1,11 +1,9 @@
-import { getLogger } from '@config/logger.js'
+import { logger } from '@config/loggerFactory.js'
 import User from '@models/schemas/Users.chemas.js'
 import dotenv from 'dotenv'
 import { Collection, Db, MongoClient, ServerApiVersion, UUID } from 'mongodb'
 
 dotenv.config()
-
-const logger = getLogger('MongoDBClient')
 
 // Kiểm tra biến môi trường
 const requiredEnvVars = ['MONGO_URI', 'DB_NAME', 'DB_COLLECTION_USERS'] as const
