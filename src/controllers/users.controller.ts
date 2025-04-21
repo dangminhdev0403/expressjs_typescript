@@ -27,4 +27,19 @@ const registerController = async (
   }
 }
 
-export { loginController, registerController }
+const logoutController = async (
+  req: Request<ParamsDictionary, Record<string, unknown>, RegisterRequestBody>,
+  res: Response
+): Promise<void> => {
+  try {
+    // const result = await userService.logout(req.body)
+    res.json({
+      message: 'Đăng xuat thanh cong'
+    })
+  } catch (error) {
+    console.error('Lỗi khi đăng xuat:', error)
+    res.status(400).json({ message: 'Đăng xuat that bai' })
+  }
+}
+
+export { loginController, logoutController, registerController }
