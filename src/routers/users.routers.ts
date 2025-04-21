@@ -1,4 +1,5 @@
 import { loginController, logoutController, registerController } from '@controllers/users.controller.js'
+import { authenticationValidator } from '@middlewares/auth.middlewares.js'
 import {
   accessTokenValidator,
   loginValidator,
@@ -15,8 +16,8 @@ usersRouter.post('/login', validates(loginValidator() as unknown as ValidationCh
 
 usersRouter.post('/register', validate(registerValidator), registerController)
 
-usersRouter.post('/logout', accessTokenValidator, logoutController)
+usersRouter.post('/logout', authenticationValidator, accessTokenValidator, logoutController)
 
-usersRouter.put('/me', updateMeValidator)
+usersRouter.put('/me', authenticationValidator, updateMeValidator)
 
 export default usersRouter

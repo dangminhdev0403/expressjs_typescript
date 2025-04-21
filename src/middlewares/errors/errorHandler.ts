@@ -30,6 +30,7 @@ export const errorHandler = (
   console.error('❌ Unexpected error:', err)
 
   return res.status(500).json({
+    statusCode: 500,
     message: 'Internal Server Error',
     error: err.message // hoặc log nhiều hơn nếu cần
   })

@@ -1,6 +1,5 @@
 import userService from '@services/UserService.js'
 import { hashPassword } from '@utils/cryto.js'
-import { verifyToken } from '@utils/jwt.js'
 import { messages } from '@utils/validationMessages.js'
 import { validate } from '@utils/validator/validation.js'
 import { confirmPasswordRule, dobRule, emailRule, nameRule, passwordRule } from '@utils/validator/validationRules.js'
@@ -75,28 +74,6 @@ export const loginValidator = () => [...validateEmailSchema, ...validatePassword
 export const accessTokenValidator = validate(
   checkSchema(
     {
-      Authorization: {
-        notEmpty: {
-          errorMessage: 'Header Authorization required'
-        },
-        custom: {
-          options: async (value: string, { req }) => {
-            // Kiểm tra header bắt đầu bằng 'Bearer '
-            const bearerRegex = /^Bearer\s+/i // Không phân biệt hoa thường
-            if (!bearerRegex.test(value)) {
-              throw new Error('Header Authorization không hợp lệ: Yêu cầu token Bearer')
-            }
-            const accessToken = value.replace(bearerRegex, '')
-            if (!accessToken) {
-              throw new Error('Header Authorization không hợp lệ: Token rỗng')
-            }
-            const deacoded_auth = await verifyToken({ token: accessToken })
-
-            req.deacoded_auth = deacoded_auth
-            return true // Kiểm tra thành công
-          }
-        }
-      },
       refresh_token: {
         notEmpty: {
           errorMessage: messages.required('Refresh token')
@@ -128,13 +105,29 @@ export const updateMeValidator = validate(
         }
       },
       location: {
-        optional: true
+        optional: true,
+        isString: {
+          errorMessage: messages.mustBeString('location')
+        },
+        trim: true
       },
       website: {
-        optional: true
+        optional: true,
+        isString: {
+          errorMessage: messages.mustBeString('location')
+        },
+        trim: true,
+        isLength: {
+          options: { max: 100, min: 10 },
+          errorMessage: messages.lengthBetween('location', 10, 100)
+        }
       },
       avatar: {
-        optional: true
+        optional: true,
+        isString: {
+          errorMessage: messages.mustBeString('avatar')
+        },
+        trim: true
       },
       coverPhoto: {
         optional: true

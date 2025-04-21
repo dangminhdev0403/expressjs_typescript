@@ -94,7 +94,7 @@ class UserService {
       throw new AppError('Invalid refresh token ', 400)
     }
 
-    const result = await this.refreshTokenCollection.deleteOne({ oken: payload.refresh_token })
+    const result = await this.refreshTokenCollection.deleteOne({ token: payload.refresh_token })
 
     if (result.deletedCount !== 1) {
       throw new Error('Failed to delete refresh token')

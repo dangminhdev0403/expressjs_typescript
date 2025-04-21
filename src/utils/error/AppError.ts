@@ -1,10 +1,10 @@
 // src/errors/AppError.ts
 
-type ErrorDetail = {
-  field?: string
+type ErrorDetail<T> = {
+  errors?: T | null
   message: string
 }
-export class AppError<T = ErrorDetail[]> extends Error {
+export class AppError<T = ErrorDetail<unknown>[]> extends Error {
   public readonly statusCode: number
   public readonly isOperational: boolean
   public readonly errors: T | null
