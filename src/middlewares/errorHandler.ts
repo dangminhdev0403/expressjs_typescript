@@ -10,13 +10,14 @@ export const errorHandler = (
   next: NextFunction // ⬅️ PHẢI có tham số này để Express nhận dạng middleware lỗi
 ) => {
   if (err instanceof AppError) {
-    const errorRes: object = createResponse(err.statusCode, err.message)
+    const errorRes: object = createResponse(err.statusCode, err.message, null, err.errors)
     return res.status(err.statusCode).json(errorRes)
   }
 
   console.error('Unexpected error:', err)
 
   return res.status(500).json({
-    message: 'Internal Server Error'
+    message: 'Internal Server Error',
+    error: err
   })
 }

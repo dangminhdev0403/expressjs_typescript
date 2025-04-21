@@ -3,19 +3,20 @@ export interface Response<T = object> {
   statusCode: number
   message: string | Record<string, object> | null
   data: T | null
-  error: string | null
+  errors: T | null
 }
 
 const createResponse = <T = object>(
   statusCode: number,
   message?: string | Record<string, object>,
   data: T | null = null,
-  error: string | null = null
+  errors: T | null = null
 ): Response<T> => {
   return {
     statusCode,
-    error: error ?? null,
     message: message ?? null,
+    errors: errors ?? null,
+
     data: data ?? null
   }
 }
