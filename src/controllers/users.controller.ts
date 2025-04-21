@@ -1,5 +1,5 @@
 import { getLoggerForModule } from '@config/logger.js'
-import { logoutRequestBody, RegisterRequestBody } from '@models/request/Users.request.js'
+import { LogoutRequestBody, RegisterRequestBody } from '@models/request/Users.request.js'
 import { createResponse } from '@models/response/format.response.js'
 import userService from '@services/UserService.js'
 import { Request, Response } from 'express'
@@ -42,7 +42,7 @@ const registerController = async (
 
 // Đăng xuất
 const logoutController = async (
-  req: Request<ParamsDictionary, Record<string, unknown>, logoutRequestBody>,
+  req: Request<ParamsDictionary, Record<string, unknown>, LogoutRequestBody>,
   res: Response
 ): Promise<void> => {
   await userService.logout(req.body)

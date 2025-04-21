@@ -20,7 +20,7 @@ export const errorHandler = (
       err.statusCode,
       err.message,
       null,
-      err.errors // chứa chi tiết lỗi nếu có (vd: mảng lỗi validate)
+      err.errors ?? err.message // chứa chi tiết lỗi nếu có (vd: mảng lỗi validate)
     )
 
     return res.status(err.statusCode).json(errorRes)

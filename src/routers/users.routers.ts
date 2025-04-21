@@ -1,6 +1,11 @@
 import { loginController, logoutController, registerController } from '@controllers/users.controller.js'
-import { accessTokenValidator, loginValidator, registerValidator } from '@middlewares/users.middlewares.js'
-import { validate, validates } from '@utils/validation.js'
+import {
+  accessTokenValidator,
+  loginValidator,
+  registerValidator,
+  updateMeValidator
+} from '@middlewares/users.middlewares.js'
+import { validate, validates } from '@utils/validator/validation.js'
 import { Router } from 'express'
 import { ValidationChain } from 'express-validator'
 
@@ -11,5 +16,7 @@ usersRouter.post('/login', validates(loginValidator() as unknown as ValidationCh
 usersRouter.post('/register', validate(registerValidator), registerController)
 
 usersRouter.post('/logout', accessTokenValidator, logoutController)
+
+usersRouter.put('/me', updateMeValidator)
 
 export default usersRouter

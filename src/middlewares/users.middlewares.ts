@@ -1,94 +1,20 @@
 import userService from '@services/UserService.js'
 import { hashPassword } from '@utils/cryto.js'
 import { verifyToken } from '@utils/jwt.js'
-import { validate } from '@utils/validation.js'
 import { messages } from '@utils/validationMessages.js'
+import { validate } from '@utils/validator/validation.js'
+import { confirmPasswordRule, dobRule, emailRule, nameRule, passwordRule } from '@utils/validator/validationRules.js'
 import { checkSchema } from 'express-validator'
 
 export const registerValidator = checkSchema(
   {
-    name: {
-      isString: {
-        errorMessage: messages.mustBeString('Name')
-      },
-      notEmpty: {
-        errorMessage: messages.required('Name')
-      },
-      isLength: {
-        options: { min: 3, max: 100 },
-        errorMessage: messages.lengthBetween('Name', 3, 100)
-      },
-      trim: true
-    },
-    email: {
-      notEmpty: {
-        errorMessage: messages.required('Email')
-      },
-      isEmail: {
-        errorMessage: messages.invalidEmail
-      },
-      normalizeEmail: true,
-      custom: {
-        options: async (value: string) => {
-          const result = await userService.checkEmailExist(value)
-          if (result) throw new Error('Email already exists')
-          return true
-        }
-      }
-    },
-    password: {
-      isString: {
-        errorMessage: messages.mustBeString('Password')
-      },
-      notEmpty: {
-        errorMessage: messages.required('Password')
-      },
-      isLength: {
-        options: { min: 6, max: 100 },
-        errorMessage: messages.lengthBetween('Password', 6, 100)
-      },
-      isStrongPassword: {
-        options: {
-          minLength: 6,
-          minLowercase: 1,
-          minUppercase: 1,
-          minNumbers: 1,
-          minSymbols: 1
-        },
-        errorMessage: messages.strongPassword
-      }
-    },
-    confirmPassword: {
-      isString: {
-        errorMessage: messages.mustBeString('Confirm password')
-      },
-      notEmpty: {
-        errorMessage: messages.required('Confirm password')
-      },
-      isLength: {
-        options: { min: 6, max: 100 },
-        errorMessage: messages.lengthBetween('Confirm password', 6, 100)
-      },
-      isStrongPassword: {
-        options: {
-          minLength: 6,
-          minLowercase: 1,
-          minUppercase: 1,
-          minNumbers: 1,
-          minSymbols: 1
-        },
-        errorMessage: messages.strongPassword
-      }
-    },
-    date_of_birth: {
-      isISO8601: {
-        options: {
-          strict: true,
-          strictSeparator: true
-        },
-        errorMessage: messages.invalidDate
-      }
-    }
+    name: nameRule,
+    email: emailRule(true),
+    password: passwordRule,
+
+    confirmPassword: confirmPasswordRule,
+
+    date_of_birth: dobRule
   },
   ['body']
 )
@@ -181,5 +107,40 @@ export const accessTokenValidator = validate(
       }
     },
     ['headers', 'body']
+  )
+)
+
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: {
+        optional: true,
+        ...nameRule
+      },
+      date_of_birth: {
+        optional: true,
+        ...dobRule
+      },
+      bio: {
+        optional: true,
+        isString: {
+          errorMessage: messages.mustBeString('Bio')
+        }
+      },
+      location: {
+        optional: true
+      },
+      website: {
+        optional: true
+      },
+      avatar: {
+        optional: true
+      },
+      coverPhoto: {
+        optional: true
+      }
+    },
+
+    ['body']
   )
 )

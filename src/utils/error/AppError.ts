@@ -3,7 +3,6 @@
 type ErrorDetail = {
   field?: string
   message: string
-  
 }
 export class AppError<T = ErrorDetail[]> extends Error {
   public readonly statusCode: number
