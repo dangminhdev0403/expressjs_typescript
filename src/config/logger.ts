@@ -1,26 +1,42 @@
 import fs from 'fs'
 import morgan from 'morgan'
 import path from 'path'
-import winston, { loggers } from 'winston'
+import winston from 'winston'
+import { fileURLToPath } from 'url'
 
 const isProd = process.env.NODE_ENV === 'production'
 
-// Tạo thư mục logs
 const logDir = path.resolve('logs')
 if (isProd && !fs.existsSync(logDir)) {
-  try {
-    fs.mkdirSync(logDir, { recursive: true })
-  } catch (error: unknown) {
-    if (error instanceof Error) loggers.close(`Failed to create log directory: ${error.message}`)
-    throw error
-  }
+  fs.mkdirSync(logDir, { recursive: true })
 }
 
-// Winston Logger chính
-const transports: winston.transport[] = [new winston.transports.Console()]
+const sensitiveFields = ['password', 'token', 'access_token', 'refresh_token']
+
+function maskSensitiveFields(obj: any): any {
+  if (!isProd) return obj
+  return JSON.parse(
+    JSON.stringify(obj, (key, value) => {
+      if (sensitiveFields.includes(key)) return '***'
+      return value
+    })
+  )
+}
+
+const baseFormat = winston.format.combine(
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  winston.format.errors({ stack: true }),
+  winston.format.printf(({ level, message, timestamp, label = 'app' }) => {
+    const masked = typeof message === 'object' ? JSON.stringify(maskSensitiveFields(message), null, 2) : String(message)
+
+    return `[${timestamp}] [${label}] ${level.toUpperCase()}: ${masked}`
+  })
+)
+
+const baseTransports: winston.transport[] = [new winston.transports.Console()]
 
 if (isProd) {
-  transports.push(
+  baseTransports.push(
     new winston.transports.File({
       filename: path.join(logDir, 'error.log'),
       level: 'error',
@@ -39,37 +55,20 @@ if (isProd) {
 
 const logger = winston.createLogger({
   level: isProd ? 'info' : 'debug',
-  defaultMeta: { label: 'app' }, // Đặt label mặc định trong meta
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.json(),
-    winston.format.printf(({ level, message, timestamp, label }) => {
-      // Sử dụng label từ meta hoặc fallback về 'app'
-      const logLabel = label || 'app'
-      return `[${timestamp}] [${logLabel}] ${level.toUpperCase()}: ${
-        typeof message === 'object' && message !== null && !Array.isArray(message) ? JSON.stringify(message) : String(message)
-      }`
-    })
-  ),
-  transports
+  defaultMeta: { label: 'app' },
+  format: baseFormat,
+  transports: baseTransports
 })
 
-// Logger HTTP
 const httpLogger = winston.createLogger({
   level: 'http',
   defaultMeta: { label: 'http' },
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(({ level, message, timestamp, label }) => {
-      return `[${timestamp}] [${label}] ${level.toUpperCase()}: ${message}`
-    })
-  ),
+  format: baseFormat,
   transports: isProd
     ? [new winston.transports.File({ filename: path.join(logDir, 'http.log') })]
     : [new winston.transports.Console()]
 })
 
-// Morgan Middleware
 const stream = {
   write: (message: string) => {
     httpLogger.http(message.trim())
@@ -78,17 +77,17 @@ const stream = {
 
 export const morganMiddleware = morgan(':method :url :status :response-time ms - :res[content-length]', { stream })
 
-// Tạo child logger
-export const getLogger = (filename: string) => {
-  const label = path.basename(filename, path.extname(filename))
+// Hàm tạo logger theo module (dùng cho ES Modules)
+export const getLoggerForModule = (url: string) => {
+  const __filename = fileURLToPath(url)
+  const label = path.basename(__filename, path.extname(__filename))
   return logger.child({ label })
 }
 
-export default logger
-
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  logger.end(() => {
-    process.exit(0)
-  })
+  logger.info('Received SIGTERM. Shutting down...')
+  process.exit(0)
 })
+
+export default logger

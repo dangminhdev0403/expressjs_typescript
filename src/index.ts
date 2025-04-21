@@ -1,7 +1,8 @@
 import { MongoDBClient } from '@config/MongoDBClient.js'
 import { morganMiddleware } from '@config/morgan.js'
+import { errorHandler } from '@middlewares/errorHandler.js'
 import usersRouter from '@routers/users.routers.js'
-import express from 'express'
+import express, { ErrorRequestHandler } from 'express'
 
 const port = 8080
 const app = express()
@@ -35,6 +36,9 @@ app.get('/test', (req, res) => {
 
 // Gắn router người dùng
 app.use('/users', usersRouter)
+
+// đặt cuối cùng
+app.use(errorHandler as unknown as ErrorRequestHandler)
 
 async function startServer() {
   try {

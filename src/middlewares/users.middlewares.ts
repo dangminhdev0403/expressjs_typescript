@@ -170,8 +170,16 @@ export const accessTokenValidator = validate(
             return true // Kiểm tra thành công
           }
         }
+      },
+      refresh_token: {
+        notEmpty: {
+          errorMessage: messages.required('Refresh token')
+        },
+        isString: {
+          errorMessage: messages.mustBeString('Refresh token ')
+        }
       }
     },
-    ['headers']
+    ['headers', 'body']
   )
 )

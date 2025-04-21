@@ -1,8 +1,8 @@
-import { getLogger } from '@config/logger.js'
+import { getLoggerForModule } from '@config/logger.js'
 import { MongoDBClient } from '@config/MongoDBClient.js'
 import { Collection, Document } from 'mongodb'
 
-const logger = getLogger('collectionFactory')
+const logger = getLoggerForModule(import.meta.url)
 export function getCollection<T extends Document>(collectionName: string, dbName?: string): Collection<T> {
   try {
     const client = MongoDBClient.getInstance()

@@ -1,4 +1,4 @@
-import { logger } from '@config/loggerFactory.js'
+import { getLoggerForModule } from '@config/logger.js'
 import User from '@models/schemas/Users.chemas.js'
 import dotenv from 'dotenv'
 import { Collection, Db, MongoClient, ServerApiVersion, UUID } from 'mongodb'
@@ -12,6 +12,7 @@ for (const envVar of requiredEnvVars) {
     throw new Error(`Missing required environment variable: ${envVar}`)
   }
 }
+const logger = getLoggerForModule(import.meta.url)
 
 // Helper: Làm sạch command log
 function cleanMongoCommand(command: Record<string, any>) {

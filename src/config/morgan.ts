@@ -1,7 +1,7 @@
-import { getLogger } from '@config/logger.js'
+import { getLoggerForModule } from '@config/logger.js'
 import morgan from 'morgan'
 
-const logger = getLogger('morgan')
+const logger = getLoggerForModule(import.meta.url)
 
 export const morganMiddleware = morgan('dev', {
   stream: {

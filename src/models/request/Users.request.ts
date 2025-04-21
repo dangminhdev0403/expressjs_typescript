@@ -5,4 +5,7 @@ interface RegisterRequestBody {
   date_of_birth: string
 }
 
-export { RegisterRequestBody }
+interface logoutRequestBody {
+  refresh_token: string
+}
+export { logoutRequestBody, RegisterRequestBody }

@@ -1,4 +1,4 @@
-import { getLogger } from '@config/logger.js'
+import { getLoggerForModule } from '@config/logger.js'
 import { MongoDBClient } from '@config/MongoDBClient.js'
 import { TokenType } from '@constants/enum.js'
 import { getCollection } from '@database/collectionFactory.js'
@@ -6,11 +6,12 @@ import { RegisterRequestBody } from '@models/request/Users.request.js'
 import { RefreshToken } from '@models/schemas/RefreshToken.schema.js'
 import User from '@models/schemas/Users.chemas.js'
 import { hashPassword } from '@utils/cryto.js'
+import { AppError } from '@utils/error/AppError.js'
 import signToken from '@utils/jwt.js'
 import { messages } from '@utils/validationMessages.js'
-import { Collection } from 'mongodb'
+import { Collection, WithId } from 'mongodb'
 
-const logger = getLogger('UserService')
+const logger = getLoggerForModule(import.meta.url)
 
 class UserService {
   private readonly usersCollection: Collection<User>
@@ -81,6 +82,25 @@ class UserService {
     await this.saveRefreshToken(user_id, refresh_token)
 
     return { access_token, refresh_token }
+  }
+
+  logout = async (payload: { refresh_token: string }) => {
+    const findRefresh: WithId<RefreshToken> | null = await this.refreshTokenCollection.findOne({
+      token: payload.refresh_token
+    })
+
+    if (!findRefresh) {
+      logger.error('Invalid refresh token and user not found')
+      throw new AppError('Invalid refresh token ', 400)
+    }
+
+    const result = await this.refreshTokenCollection.deleteOne({ oken: payload.refresh_token })
+
+    if (result.deletedCount !== 1) {
+      throw new Error('Failed to delete refresh token')
+    }
+
+    return true
   }
 }
 
